@@ -9,6 +9,7 @@ class Client : public QObject
     Q_OBJECT
 public:
     explicit Client(QObject *parent = nullptr);
+    void tryConnect();
 
 private slots:
     void onConnected();

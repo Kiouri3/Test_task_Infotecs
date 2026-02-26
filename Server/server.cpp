@@ -30,6 +30,7 @@ void Server::startTask(double a, double b, double step) {
 
     double currentA = a;
     double fullRange = b - a;
+
     for (auto& client : _clients) {
         double weight = static_cast<double>(client->cores) / totalCores;
         double rangeForClient = fullRange * weight;

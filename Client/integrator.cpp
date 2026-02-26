@@ -37,7 +37,7 @@ double Integrator::integrateParallel(double a, double b, double step)
         throw std::runtime_error("Singularity at x = 1");
     }
 
-    unsigned int count_threads = thread::hardware_concurrency();
+    unsigned int count_threads = 4;
 
     if (count_threads == 0) {
         count_threads = 2;    // Если не смогли вычислить

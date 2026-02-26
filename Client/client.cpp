@@ -8,10 +8,15 @@ Client::Client(QObject *parent) {
     connect(m_socket, &QTcpSocket::connected, this, &Client::onConnected);
     connect(m_socket, &QTcpSocket::readyRead, this, &Client::onReadyRead);
     connect(m_socket, &QAbstractSocket::errorOccurred, this, &Client::onError);
-
-    m_socket->connectToHost("127.0.0.1", 1234);
 }
 
+void Client::tryConnect() {
+    // Пытаемся соединиться только если сокет полностью свободен
+    if (m_socket->state() == QAbstractSocket::UnconnectedState) {
+        qDebug() << "Client: Attempting to connect to server...";
+        m_socket->connectToHost("127.0.0.1", 1234);
+    }
+}
 
 void Client::onConnected() {
     qDebug() << "Client: Connected to server.";
