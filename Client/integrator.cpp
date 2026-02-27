@@ -7,12 +7,18 @@
 
 using namespace std;
 
-// Вспомогательная функция
+/**
+ * @brief Вычисляемая подынтегральная функция f(x) = 1 / ln(x).
+ * @param x Аргумент функции.
+ * @return Значение функции в точке x.
+ */
 static double f(double x) {
     return 1 / std::log(x);
 }
 
-// Однопоточное вычисление методом средних прямоугольников.
+/**
+ * @brief Реализация метода средних прямоугольников.
+ */
 double Integrator::integrate(double a, double b, double step)
 {
     if (a <= 1.0 && b >= 1.0) {
@@ -30,14 +36,17 @@ double Integrator::integrate(double a, double b, double step)
     return sum;
 }
 
-// Многопоточное вычисление
+/**
+ * @brief Распределяет вычисления между аппаратными потоками.
+ * * Создает std::thread для каждой части интервала и собирает результаты через std::accumulate.
+ */
 double Integrator::integrateParallel(double a, double b, double step)
 {
     if (a <= 1.0 && b >= 1.0) {
         throw std::runtime_error("Singularity at x = 1");
     }
 
-    unsigned int count_threads = 4;
+    unsigned int count_threads = thread::hardware_concurrency();
 
     if (count_threads == 0) {
         count_threads = 2;    // Если не смогли вычислить
