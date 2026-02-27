@@ -38,7 +38,7 @@ void Server::startTask(double a, double b, double step) {
 
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_6_10);
+        out.setVersion(QDataStream::Qt_6_9);
         out << currentA << currentB << step;
 
         client->socket->write(block);
@@ -63,8 +63,7 @@ void Server::onNewConnection() {
 void Server::onReadyRead() {
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
     QDataStream in(socket);
-    in.setVersion(QDataStream::Qt_6_10);
-    qDebug() << "onReadyRead";
+    in.setVersion(QDataStream::Qt_6_9);
 
     // Находим, какой клиент прислал данные
     for (auto client : _clients) {
@@ -81,12 +80,18 @@ void Server::onReadyRead() {
                 client->isReady = true;
                 _responsesReceived++;
                 qInfo() << "Server: Received partial result from client.";
-
                 // Если все ответили, суммируем
                 if (_responsesReceived == _clients.size()) {
                     double total = 0;
-                    for (auto c : _clients) total += c->partialResult;
+                    for (auto c : _clients) {
+                        total += c->partialResult;
+
+                        // Зануляем результаты для других вычислений
+                        c->partialResult = 0;
+                        c->isReady = false;
+                    }
                     qInfo() << "FINAL RESULT:" << total;
+                    _responsesReceived = 0;
                 }
             }
             break;
@@ -100,6 +105,7 @@ void Server::onClientDisconnected() {
         if (_clients[i]->socket == socket) {
             qInfo() << "Server: Client disconnected.";
             delete _clients[i];
+            _clients.erase(_clients.begin() + i);
             break;
         }
     }

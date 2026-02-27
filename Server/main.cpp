@@ -8,17 +8,10 @@ int main(int argc, char *argv[]) {
 
     Server server(1234);
 
-    // Создаем объекты в куче (heap)
     QThread* thread = new QThread();
     ConsoleReader* reader = new ConsoleReader();
-
     reader->moveToThread(thread);
-
-    // Соединяем сигнал со слотом.
-    // Обрати внимание: 4-й аргумент Qt::QueuedConnection критически важен!
     QObject::connect(reader, &ConsoleReader::taskReady, &server, &Server::startTask, Qt::QueuedConnection);
-
-    // Запуск логики чтения при старте потока
     QObject::connect(thread, &QThread::started, reader, &ConsoleReader::run);
 
     // Чистим память после закрытия

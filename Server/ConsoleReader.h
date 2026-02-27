@@ -4,17 +4,16 @@
 #include <QObject>
 #include <iostream>
 #include <string>
+#include <QThread>
 
 class ConsoleReader : public QObject {
     Q_OBJECT
 public:
-
     double readDouble(const std::string& label, double minVal = -std::numeric_limits<double>::max()) {
         std::string input;
         double value;
         while (true) {
             std::cout << label << " " << std::flush;
-
             if (!std::getline(std::cin, input)) {
                 std::cin.clear();
                 continue;
@@ -45,26 +44,26 @@ public:
 
 public slots:
     void run() {
-        double a, b, step;
-
         while (true) {
             std::cout << "\n--- Configuration of New Task ---" << "\n";
+            double a = readDouble("Enter lower limit (a):");
+            double b = readDouble("Enter upper limit (b):", a + 0.000001);
 
-            a = readDouble("Enter lower limit (a):");
-            b = readDouble("Enter upper limit (b):", a + 0.000001);
-            step = readDouble("Enter integration step:");
+            if (a <= 1.0 && b >= 1.0) {
+                std::cout << "Error.The interval contains x = 1\n"
+                          << "Please choose an interval that does not include 1.0\n";
+                continue;
+            }
+
+            double step = readDouble("Enter integration step:");
 
             std::cout << "\nReady! Settings: [" << a << " to " << b << "], step: " << step << "\n";
-            break;
-        }
-
-        while (true) {
             std::cout << "Press ENTER to send task to clients...\n";
 
             std::string dummy;
             std::getline(std::cin, dummy);
-
             emit taskReady(a, b, step);
+            QThread::msleep(500);
         }
     }
 

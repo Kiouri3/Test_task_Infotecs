@@ -26,7 +26,7 @@ void Client::onConnected() {
     // Отправляем серверу количество ядер клиента
     QByteArray data;
     QDataStream out(&data, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_10);
+    out.setVersion(QDataStream::Qt_6_9);
 
     out << cores;
     m_socket->write(data);
@@ -44,7 +44,7 @@ void Client::onReadyRead() {
 
     QByteArray data;
     QDataStream out(&data, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_10);
+    out.setVersion(QDataStream::Qt_6_9);
 
     out << result;
     m_socket->write(data);
